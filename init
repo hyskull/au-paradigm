@@ -1,0 +1,328 @@
+#ifndef HYSKULL_AU_PARADIGM
+#define HYSKULL_AU_PARADIGM
+
+namespace au
+{
+	using bln_t = bool; 		using bln_p = bool*; 		 using bln_r = bool&; 		using bln_l = bool*&;
+	using x08_t = uint8_t; 	using x08_r = uint8_t&;	 using x08_p = uint8_t*;	using x08_l = uint8_t*&;
+	using e08_t = int8_t;  	using e08_r = int8_t&; 	 using e08_p = int8_t*;		using e08_l = int8_t*&;
+	using x16_t = uint16_t; using x16_r = uint16_t&; using x16_p = uint16_t*;	using x16_l = uint16_t*&;
+	using e16_t = int16_t; 	using e16_r = int16_t&;  using e16_p = int16_t*; 	using e16_l = int16_t*&;
+	using x32_t = uint32_t;	using x32_r = uint32_t&; using x32_p = uint32_t*; using x32_l = uint32_t*&;
+	using e32_t = int32_t; 	using e32_r = int32_t&;  using e32_p = int32_t*; 	using e32_l = int32_t*&;
+	using x64_t = uint64_t; using x64_r = uint64_t&; using x64_p = uint64_t*; using x64_l = uint64_t*&;
+	using e64_t = int64_t; 	using e64_r = int64_t&;  using e64_p = int64_t*;  using e64_l = int64_t*&;
+	using f32_t = float;		using f32_p = float*; 	 using f32_r = float&;		using f32_l = float*&;
+	using f64_t = double; 	using f64_p = double*; 	 using f64_r = double&; 	using f64_l = double*&;
+
+	using str_c = char;			using str_p = char*; 		 using str_l = char*&; 		using str_x = const char*;
+	using len_t = size_t; 	using len_p = size_t*;	 using len_r = size_t&; 	using len_l = size_t*&;
+
+	using nan_t = void; using any_p = void*;
+	
+	struct Paradigm;
+	using prd_t = Paradigm;
+	using prd_p = Paradigm*;
+	using prd_r = Paradigm&; 
+	using prd_l = Paradigm*&;
+	
+	struct Archetype;
+	using arc_t = Archetype;
+	using arc_p = Archetype*;
+	using arc_r = Archetype&; 
+	using arc_l = Archetype*&;
+	
+	struct Header;
+	using hdr_t = Header;
+	using hdr_p = Header*;
+	using hdr_r = Header&; 
+	using hdr_l = Header*&; 
+	
+	struct Cursor;
+	using cur_t = Cursor;
+	using cur_p = Cursor*;
+	using cur_r = Cursor&; 
+	using cur_l = Cursor*&; 
+	
+	template <typename ini_t> struct Vector;
+	template <typename ini_t> using vec_t= Vector<ini_t>  ;
+	template <typename ini_t> using vec_p= Vector<ini_t>* ;
+	template <typename ini_t> using vec_r= Vector<ini_t>& ;
+	template <typename ini_t> using vec_l= Vector<ini_t>*&;
+	
+	template <typename ini_t> struct Object;
+	template <typename ini_t> using obj_t = Object<ini_t>  ;
+	template <typename ini_t> using obj_p = Object<ini_t>* ;
+	template <typename ini_t> using obj_r = Object<ini_t>& ;
+	template <typename ini_t> using obj_l = Object<ini_t>*&;	
+		
+	struct str_t;
+
+	struct table;
+	using tbl_t = table;
+	using tbl_p = table*;
+	using tbl_r = table&;
+	using tbl_l = table*&; 
+	
+	namespace hidden
+	{
+		template<prd_r meta> hdr_p new_head(len_t, len_t);
+		template<prd_r meta> hdr_p prd_junk(hdr_p);
+		template<prd_r meta> hdr_p prd_push(hdr_p);
+		template<prd_r meta> hdr_p prd_find(hdr_p);
+		template<prd_r meta> hdr_p prd_look(hdr_p);
+		template<prd_r meta> hdr_p prd_grab(hdr_p);
+		template<arc_r meta> hdr_p arc_junk(hdr_p);
+		template<arc_r meta> hdr_p arc_push(hdr_p);
+		template<arc_r meta> hdr_p arc_find(hdr_p);
+		template<arc_r meta> hdr_p arc_look(hdr_p);
+		template<arc_r meta> hdr_p arc_grab(hdr_p);
+	}
+	
+
+	template<typename ini_p, prd_r meta> 							ini_p to_open(len_t);
+	template<typename ini_p, prd_r meta, arc_r type> 	ini_p to_open(len_t);
+	template<typename ini_p, prd_r meta>							ini_p re_open(len_t);
+	template<typename ini_p, prd_r meta, arc_r type> 	ini_p re_open(len_t);
+	template<typename ini_p, prd_r meta> 							ini_p to_open(len_t);
+	template<typename ini_p, prd_r meta, arc_r type>	ini_p to_open(len_t);
+}
+
+struct au::Header
+{
+	hdr_p next{nullptr};
+	len_t data{0};
+	len_t size{0};
+	
+	template <typename ini_t> inline ini_t* ptr() { return  reinterpret_cast<ini_t*>(data); }
+	template <typename ini_t> inline ini_t  get() { return *reinterpret_cast<ini_t*>(data); }
+};
+
+template <typename ini_t>
+struct au::Object
+{
+	obj_p<ini_t> next = nullptr;
+	
+	ini_t key, val;
+};
+
+struct au::Paradigm
+{
+	friend struct segment;
+	
+	  Paradigm(len_t l, str_c b = 0)
+  : range(l)
+  { 
+    scape= reinterpret_cast<len_t>( new x08_t[l] );
+    memset(ptr(), 0, l);
+  }
+	
+	 ~Paradigm() 
+  {
+    delete[] ptr(); 
+    hdr_p ndx = nullptr; 
+  }
+  
+	inline 													x08_p ptr()				 { return reinterpret_cast<x08_p >(scape);			}
+	inline 													x08_p ptr(len_t x) { return reinterpret_cast<x08_p >(scape + x);	}
+	template<typename ini_t> inline x08_p ptr(len_t x) { return reinterpret_cast<ini_t*>(scape + x);	}
+	inline len_t max_len()		{ return range; }
+	inline len_t get_len()		{ return range - sizeof(hdr_t) * width; }
+	
+  any_p to_open(len_t);				// | allocate a memory block 
+  any_p re_open(any_p, len_t);// | reallocate a memory block 
+  any_p co_open(any_p, len_t);// | resize a memory block
+  any_p be_open(len_t, len_t);// | allocate to that address
+	
+  template <typename ini_t> ini_t* to_open(len_t);
+  template <typename ini_t> ini_t* re_open(any_p, len_t);
+  template <typename ini_t> ini_t* co_open(any_p, len_t);
+	
+  template <typename ini_t> ini_t* 			 provide_type(ini_t);
+  template <typename ini_t> vec_t<ini_t> provide_list(len_t);
+  template <typename ini_t> ini_t& 			 provide_plan(any_p, any_p); 
+	str_t 													 			 provide_form(str_x);
+	
+  len_t 			size(any_p trg){ return find(trg)->size; }
+  inline void shut( any_p cur )
+  {
+    hdr_p  dlt = grab(cur);
+    if(not dlt) return;
+    memset(cur, 0, dlt->size);
+		memset(dlt, 0, sizeof(hdr_t));
+    junk( dlt );
+  }
+  
+  void 				reset()
+  {
+    hdr_p ndx = nullptr;
+    while(entry)
+    {
+      ndx   = entry;
+      entry = entry->next;
+
+      delete ndx;
+    }
+  }
+	
+//private: 
+	hdr_p entry{nullptr};
+  hdr_p empty{nullptr};
+	
+	len_t scape{ 0 };
+	len_t range{ 0 };
+	len_t width{ 0 };
+	
+	#include "paradigm_head.hpp"
+};
+
+struct au::Archetype
+{
+	 Archetype(prd_r meta, len_t len)
+	: meta(meta)
+	,	scape( reinterpret_cast<len_t>(meta.to_open(len)) )
+	,	range( len )
+	{
+	}
+	
+	~Archetype()
+	{
+		meta.shut(reinterpret_cast<any_p>(scape));
+		for(hdr_p ndx = entry; ndx; ndx = ndx->next) 
+			meta.junk(ndx);
+	}
+	
+	any_p to_open(len_t demand)
+	{
+		if(demand == 0) return nullptr;
+		
+		hdr_p cur = seek(demand);
+		if(not cur) return nullptr;
+		
+		return cur->ptr<void>();
+	}
+	
+	template <typename ini_t>
+	ini_t* to_open(len_t demand)
+	{
+		if(demand == 0) return nullptr;
+		
+		hdr_p cur = seek(demand);
+		if(not cur) return nullptr;
+		
+		return cur->ptr<ini_t>();
+	}
+	
+	inline x08_p ptr()						{ return reinterpret_cast<x08_p>(scape); }
+	inline x08_p ptr(len_t offset){ return reinterpret_cast<x08_p>(scape + offset); }
+	
+//private:
+	prd_r meta;
+	hdr_p entry = nullptr;
+
+	len_t scape{0};
+	len_t range{0};
+	
+	#include "archetype_head.hpp"
+};
+
+template <typename ini_t>
+struct au::Vector
+{
+  bool operator +=(len_t npt)
+  {
+    ini_t* new_vec = nullptr;
+    if( data == nullptr )
+    {
+      new_vec = meta.to_open<ini_t>( npt );
+      if(not new_vec) return false;
+      
+      data = new_vec;
+      size = npt;
+      return true;
+    }
+    else
+    {
+      new_vec = meta.co_open<ini_t>(data, sizeof(ini_t)*(size+npt));
+      if(new_vec == nullptr) 
+			new_vec = meta.re_open<ini_t>(data, sizeof(ini_t)*(size+npt));
+			if(new_vec == nullptr) 
+		  return false;
+			
+			data = new_vec;
+      size = size + npt;
+      return true;
+    }
+  }
+  
+  bool operator -=(len_t npt)
+  {
+    if(npt > size)
+    {
+      meta.shut(data);
+      size = 0;
+      return false;
+    }
+    
+    ini_t* new_vec = meta.co_open<ini_t>(data, sizeof(ini_t)*(size - npt));
+    if(not new_vec) 
+      return false;
+    
+    data = new_vec;
+    size -= npt;
+    
+    return true;
+  }
+	
+	// | push back
+	vec_t<ini_t>& operator> (ini_t target){ (*this) += 1, data[size - 1] = target; return *this; }
+	ini_t*       operator>>	(ini_t target){ (*this) += 1; return &data[size - 1] = target; }
+	vec_t<ini_t>& operator< (ini_t target){ (*this) += 1; data[0] = target; return *this; }
+	vec_t<ini_t> operator<<	(ini_t target){ (*this) += 1; memmove(data+1, data, sizeof(ini_t)*size); data[0] = target; return *this; }
+  
+	ini_t* push_back(){ this->operator+=(1); return &data[size - 1]; }
+	
+	ini_t* vec() const { return data; }
+	
+  bool operator==(len_t size)
+  {
+    ini_t* new_vec = meta.co_open<ini_t>(data, size);
+    if(not new_vec) 
+      return false;
+  
+    return true;
+  }
+  
+  void reset()
+  {
+    meta.shut(data);
+    data = nullptr;
+    size = 0;
+  }
+
+  len_t  len() { return size; }
+	ini_t* vec() { return data; }
+	ini_t& back(){ return data[size - 1]; }
+  ini_t* operator * ()          { return data; }
+  ini_t& operator [](len_t ndx) { return data[ndx]; }
+	ini_t* operator ()(len_t ndx) { return ndx <= size ? &data[ndx] : nullptr; }
+  
+  ini_t* begin() const { return data; }
+	ini_t* end()   const { return data + size; } 
+	 
+//private:
+  prd_r  meta = nullptr;
+  ini_t* data = nullptr;
+  len_t  size = 0;
+};
+
+// | initialize prototype
+namespace au
+{
+	#include "paradigm_body.hpp"
+	#include "vector_body.hpp"
+}
+
+//#include "statement.hpp"
+
+#endif // | closing "HYSKULL_AU_PARADIGM"
