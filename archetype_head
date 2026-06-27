@@ -1,0 +1,110 @@
+#ifndef HYSKULL_PARADIGM_ARCHETYPE__HPP
+#define HYSKULL_PARADIGM_ARCHETYPE__HPP
+
+hdr_p seek(len_t demand)
+{
+	len_t cap{ range }, max{ 0 }; 
+	
+	if(entry)
+	{
+		if( (entry->data - scape) >= demand )
+		  return meta.new_head(scape, demand);
+	}
+	else
+		return (cap >= demand) ? meta.new_head(scape, demand) : nullptr;
+	
+	for( hdr_p cur{entry}; cur != nullptr; cur = cur->next )
+	{
+		len_t current_start = cur->data - scape,
+					current_close = current_start + cur->size,
+					next_start 		= cur->next ? cur->next->data - scape : cap;			
+		
+		if(current_start > max)
+			max = current_close;
+		
+		if(next_start >= current_close and 
+			(next_start -  current_close) >= demand)
+			return meta.new_head(scape + current_close, demand);
+	}
+	
+	if(cap > max and (cap - max) >= demand)
+		return meta.new_head(scape + max, demand);
+	
+	return nullptr;
+}
+
+/*
+hdr_p find(any_p target)
+{
+  for(hdr_p ndx = entry;
+              ndx;
+              ndx = ndx->next)
+  if(ndx->data == reinterpret_cast<len_t>(target)) return ndx;
+    
+  return nullptr;
+}
+
+hdr_p look(any_p target)
+{
+	for(hdr_p ndx = entry; ndx; ndx = ndx->next)
+		if(len_t start = ndx->data,
+						 close = ndx->data + ndx->size
+		; reinterpret_cast<len_t>(target) >= start and 
+			reinterpret_cast<len_t>(target) <  close )
+		return ndx;
+		
+	return nullptr;
+}
+ 
+hdr_p grab(any_p target)
+{
+  hdr_p ndx = entry;
+  hdr_p pre = nullptr;
+    
+  while( ndx )
+  {
+    if( ndx->data == reinterpret_cast<len_t>(target) )
+    {
+      if(pre)
+        pre->next = ndx->next;
+      else
+        entry = ndx->next;
+        
+      return ndx;
+    }
+      
+    pre = ndx, 
+		ndx = ndx->next;  
+  }
+  return nullptr;
+}
+  
+void push(hdr_p npt)
+{
+  hdr_p
+  trg = entry,
+  pre = nullptr;
+	
+  while(trg and trg->data < npt->data)
+    pre = trg, trg = trg->next;
+  
+  npt->next = trg;
+  
+  if(pre) pre->next = npt;
+  else    entry 		= npt;
+}
+
+void junk(hdr_p cur)
+{
+	for(hdr_p ndx = entry, pre = nullptr; ndx; pre = ndx, ndx = ndx->next)
+	if(ndx == cur)
+	{
+		if(pre == nullptr)
+			entry = entry->next;
+		else 
+			pre->next = ndx->next
+		
+		target->junk(ndx);
+}*/
+
+#endif // | HYSKULL_PARADIGM_ARCHETYPE__HPP
