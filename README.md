@@ -66,3 +66,4 @@ any_p say = mem.to_open(12); memset(say, "hello_world", 11);
 // | to_open(len)       - allocate a region of byte
 // | re_open(ptr, len)  - reallocate to a new region of memory
 // | co_open(ptr, len)  - resize the ptr if it possible
+mem.shut(say); // | once it need to close the ptr.
