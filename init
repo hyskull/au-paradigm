@@ -1,22 +1,22 @@
-#ifndef HYSKULL_AU_PARADIGM
-#define HYSKULL_AU_PARADIGM
+#ifndef HYSKULL_AU_PARADIGM__HPP
+#define HYSKULL_AU_PARADIGM__HPP
 
 namespace au
 {
-	using bln_t = bool; 		using bln_p = bool*; 		 using bln_r = bool&; 		using bln_l = bool*&;
+	using bln_t = bool; 	using bln_p = bool*; 	 using bln_r = bool&; 		using bln_l = bool*&;
 	using x08_t = uint8_t; 	using x08_r = uint8_t&;	 using x08_p = uint8_t*;	using x08_l = uint8_t*&;
 	using e08_t = int8_t;  	using e08_r = int8_t&; 	 using e08_p = int8_t*;		using e08_l = int8_t*&;
 	using x16_t = uint16_t; using x16_r = uint16_t&; using x16_p = uint16_t*;	using x16_l = uint16_t*&;
 	using e16_t = int16_t; 	using e16_r = int16_t&;  using e16_p = int16_t*; 	using e16_l = int16_t*&;
-	using x32_t = uint32_t;	using x32_r = uint32_t&; using x32_p = uint32_t*; using x32_l = uint32_t*&;
+	using x32_t = uint32_t;	using x32_r = uint32_t&; using x32_p = uint32_t*; 	using x32_l = uint32_t*&;
 	using e32_t = int32_t; 	using e32_r = int32_t&;  using e32_p = int32_t*; 	using e32_l = int32_t*&;
-	using x64_t = uint64_t; using x64_r = uint64_t&; using x64_p = uint64_t*; using x64_l = uint64_t*&;
-	using e64_t = int64_t; 	using e64_r = int64_t&;  using e64_p = int64_t*;  using e64_l = int64_t*&;
-	using f32_t = float;		using f32_p = float*; 	 using f32_r = float&;		using f32_l = float*&;
+	using x64_t = uint64_t; using x64_r = uint64_t&; using x64_p = uint64_t*; 	using x64_l = uint64_t*&;
+	using e64_t = int64_t; 	using e64_r = int64_t&;  using e64_p = int64_t*;  	using e64_l = int64_t*&;
+	using f32_t = float;	using f32_p = float*; 	 using f32_r = float&;		using f32_l = float*&;
 	using f64_t = double; 	using f64_p = double*; 	 using f64_r = double&; 	using f64_l = double*&;
 
-	using str_c = char;			using str_p = char*; 		 using str_l = char*&; 		using str_x = const char*;
-	using len_t = size_t; 	using len_p = size_t*;	 using len_r = size_t&; 	using len_l = size_t*&;
+	using str_c = char;		using str_p = char*;	using str_l = char*&; 		using str_x = const char*;
+	using len_t = size_t; 	using len_p = size_t*;	using len_r = size_t&;		using len_l = size_t*&;
 
 	using nan_t = void; using any_p = void*;
 	
@@ -123,9 +123,9 @@ struct au::Paradigm
     hdr_p ndx = nullptr; 
   }
   
-	inline 													x08_p ptr()				 { return reinterpret_cast<x08_p >(scape);			}
-	inline 													x08_p ptr(len_t x) { return reinterpret_cast<x08_p >(scape + x);	}
-	template<typename ini_t> inline x08_p ptr(len_t x) { return reinterpret_cast<ini_t*>(scape + x);	}
+	inline 							x08_p ptr()			{ return reinterpret_cast<x08_p >(scape);			}
+	inline 							x08_p ptr(len_t x)	{ return reinterpret_cast<x08_p >(scape + x);	}
+	template<typename ini_t> inline x08_p ptr(len_t x)	{ return reinterpret_cast<ini_t*>(scape + x);	}
 	inline len_t max_len()		{ return range; }
 	inline len_t get_len()		{ return range - sizeof(hdr_t) * width; }
 	
@@ -138,10 +138,10 @@ struct au::Paradigm
   template <typename ini_t> ini_t* re_open(any_p, len_t);
   template <typename ini_t> ini_t* co_open(any_p, len_t);
 	
-  template <typename ini_t> ini_t* 			 provide_type(ini_t);
-  template <typename ini_t> vec_t<ini_t> provide_list(len_t);
-  template <typename ini_t> ini_t& 			 provide_plan(any_p, any_p); 
-	str_t 													 			 provide_form(str_x);
+  template <typename ini_t> ini_t* 		 	provide_type(ini_t); 		// | MARKED: as deprecated
+  template <typename ini_t> vec_t<ini_t> 	provide_list(len_t);		// | this provide a build in vector 
+  template <typename ini_t> ini_t&			provide_plan(any_p, any_p); // | work in progress may remove from the future
+  // str_t 									provide_form(str_x);		// | revisit later <i may use diffirent encoding and i do am building my>
 	
   len_t 			size(any_p trg){ return find(trg)->size; }
   inline void shut( any_p cur )
@@ -153,7 +153,7 @@ struct au::Paradigm
     junk( dlt );
   }
   
-  void 				reset()
+  void reset()
   {
     hdr_p ndx = nullptr;
     while(entry)
@@ -165,8 +165,8 @@ struct au::Paradigm
     }
   }
 	
-//private: 
-	hdr_p entry{nullptr};
+//private:  future be private
+  hdr_p entry{nullptr};
   hdr_p empty{nullptr};
 	
 	len_t scape{ 0 };
@@ -322,7 +322,4 @@ namespace au
 	#include "paradigm_body.hpp"
 	#include "vector_body.hpp"
 }
-
-//#include "statement.hpp"
-
 #endif // | closing "HYSKULL_AU_PARADIGM"
