@@ -1,0 +1,142 @@
+#ifndef HYSKULL_PARADIGM_BODY__HPP
+#define HYSKULL_PARADIGM_BODY__HPP
+
+template <typename ini_t>
+vec_t<ini_t> Paradigm::provide_list(len_t size)
+{
+  if(size == 0)
+  return 
+  vec_t<ini_t> {*this, nullptr, 0};
+    
+  hdr_p cur = seek( sizeof(ini_t) * size );
+  if(not cur) 
+  return 
+  vec_t<ini_t> {*this, nullptr, 0};
+  
+  push(cur);
+  return 
+  vec_t<ini_t>{*this, cur->ptr<ini_t>(), size};
+}
+
+template<typename ini_t>
+ini_t* Paradigm::to_open(len_t len)
+{
+  if(len == 0) return nullptr;
+  hdr_p cur = seek( len * sizeof(ini_t) );
+  if(not cur) return nullptr;
+
+  push(cur);
+  return cur->ptr<ini_t>();
+}
+
+any_p Paradigm::to_open(len_t len)
+{
+  if(len == 0) return nullptr;
+  hdr_p cur = seek( len );
+  if(not cur) return nullptr;
+
+  push(cur);
+  return cur->ptr<any_p>();
+}
+
+any_p Paradigm::be_open(len_t pos, len_t len)
+{
+  if(len == 0) return nullptr;
+  
+  for(hdr_p ndx = entry; ndx; ndx = ndx->next)
+    if( pos >= ndx->data and pos < ndx->data + ndx->size ) return nullptr;
+
+  for(x08_p ndx = ptr(pos); ndx < ptr(pos+len); ndx++)
+    if( find(ndx) ) return nullptr;
+    
+  hdr_p cur = new hdr_t{ nullptr, reinterpret_cast<len_t>(scape + pos), len };
+  
+  push(cur);
+  return reinterpret_cast<any_p>(cur->data);
+}
+
+template<typename ini_t>
+ini_t* Paradigm::re_open(any_p trg, len_t len)
+{
+  hdr_p old_h = grab( trg );
+  hdr_p new_h = seek( len );
+  if(not new_h)
+  {
+    push(old_h);
+    return nullptr;
+  };
+	
+  if(old_h)
+  {
+    memmove(new_h->ptr<ini_t>(), old_h->ptr<ini_t>(), old_h->size);
+    junk(old_h); 
+  }
+    
+  push(new_h);
+  return new_h->ptr<ini_t>();
+}
+
+any_p Paradigm::re_open(any_p trg, len_t len)
+{	
+  hdr_p old_h = grab( trg );
+  hdr_p new_h = seek( len );
+	if(not new_h)
+  {
+    push(old_h);
+    return nullptr;
+  }
+  
+  if( old_h )
+	{	if(len == 0)		
+			return nullptr;
+		else
+		{
+			memmove(
+				new_h-> ptr<x08_t>(), 
+				old_h-> ptr<x08_t>(), 
+				old_h-> size
+			);
+			
+			junk(old_h);
+		}
+	}
+	
+  push(new_h);
+  return new_h->ptr<nan_t>();
+}
+
+any_p Paradigm::co_open(any_p ptr, len_t size)
+{
+  if(size == 0) return nullptr;
+  hdr_p trg = find(ptr);
+  if(not trg) return nullptr;
+  
+  if(size < trg->size)
+  {
+    if(size > 0) trg->size = size;
+    return trg->ptr<nan_t>();
+  }
+
+  len_t max = trg->next ? trg->next->data - trg->data : range - trg->data;
+  if(size > max) return nullptr;
+  
+  trg->size = size;
+  return trg->ptr<nan_t>();
+}
+
+template <typename ini_t>
+ini_t* Paradigm::co_open(any_p ptr, len_t size)
+{
+  hdr_p trg = find(ptr);
+  if(not trg) return nullptr;
+      
+  len_t max = trg->next ? trg->next->data - trg->data : range - trg->data;
+  if(size > max) return nullptr;
+  
+  trg->size = size;
+  return trg->ptr<ini_t>();
+}
+/*
+x08_p  
+*/
+#endif
