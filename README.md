@@ -1,6 +1,7 @@
 # au-paradigm
 
 Paradigm / archetype: cpp::memory-allocator
+| warning: this module is still experimental
 
 A small, focused C++ archetype that demonstrates a memory allocator paradigm for use in projects or as a template to build custom allocators. This repository provides the skeleton, examples, and tests needed to implement and evaluate allocators that conform to modern C++ allocator concepts.
 
